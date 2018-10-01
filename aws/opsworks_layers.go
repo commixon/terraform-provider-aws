@@ -218,7 +218,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"downscaling_cpu_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
-			Default:  -1, // -1 disables the threshold
+			Default:  30,
 		},
 
 		"downscaling_ignore_metrics_time": {
@@ -236,6 +236,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"downscaling_load_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"downscaling_mem_threshold": {
@@ -259,7 +260,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"upscaling_cpu_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
-			Default:  -1, // -1 disables the threshold
+			Default:  80,
 		},
 
 		"upscaling_ignore_metrics_time": {
@@ -277,6 +278,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"upscaling_load_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"upscaling_mem_threshold": {
