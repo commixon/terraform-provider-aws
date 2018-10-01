@@ -218,7 +218,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"downscaling_cpu_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
-			Default:  30,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"downscaling_ignore_metrics_time": {
@@ -241,6 +241,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"downscaling_mem_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"downscaling_threshold_wait_time": {
@@ -258,7 +259,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"upscaling_cpu_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
-			Default:  80,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"upscaling_ignore_metrics_time": {
@@ -281,6 +282,7 @@ func (lt *opsworksLayerType) SchemaResource() *schema.Resource {
 		"upscaling_mem_threshold": {
 			Type:     schema.TypeFloat,
 			Optional: true,
+			Default:  -1, // -1 disables the threshold
 		},
 
 		"upscaling_threshold_wait_time": {
@@ -451,13 +453,13 @@ func (lt *opsworksLayerType) Create(d *schema.ResourceData, client *opsworks.Ops
 		EnableAutoHealing:           aws.Bool(d.Get("auto_healing").(bool)),
 		InstallUpdatesOnBoot:        aws.Bool(d.Get("install_updates_on_boot").(bool)),
 		LifecycleEventConfiguration: lt.LifecycleEventConfiguration(d),
-		Name:                     aws.String(d.Get("name").(string)),
-		Packages:                 expandStringSet(d.Get("system_packages").(*schema.Set)),
-		Type:                     aws.String(lt.TypeName),
-		StackId:                  aws.String(d.Get("stack_id").(string)),
-		UseEbsOptimizedInstances: aws.Bool(d.Get("use_ebs_optimized_instances").(bool)),
-		Attributes:               lt.AttributeMap(d),
-		VolumeConfigurations:     lt.VolumeConfigurations(d),
+		Name:                        aws.String(d.Get("name").(string)),
+		Packages:                    expandStringSet(d.Get("system_packages").(*schema.Set)),
+		Type:                        aws.String(lt.TypeName),
+		StackId:                     aws.String(d.Get("stack_id").(string)),
+		UseEbsOptimizedInstances:    aws.Bool(d.Get("use_ebs_optimized_instances").(bool)),
+		Attributes:                  lt.AttributeMap(d),
+		VolumeConfigurations:        lt.VolumeConfigurations(d),
 	}
 
 	if lt.CustomShortName {
@@ -514,11 +516,11 @@ func (lt *opsworksLayerType) Update(d *schema.ResourceData, client *opsworks.Ops
 		EnableAutoHealing:           aws.Bool(d.Get("auto_healing").(bool)),
 		InstallUpdatesOnBoot:        aws.Bool(d.Get("install_updates_on_boot").(bool)),
 		LifecycleEventConfiguration: lt.LifecycleEventConfiguration(d),
-		Name:                     aws.String(d.Get("name").(string)),
-		Packages:                 expandStringSet(d.Get("system_packages").(*schema.Set)),
-		UseEbsOptimizedInstances: aws.Bool(d.Get("use_ebs_optimized_instances").(bool)),
-		Attributes:               lt.AttributeMap(d),
-		VolumeConfigurations:     lt.VolumeConfigurations(d),
+		Name:                        aws.String(d.Get("name").(string)),
+		Packages:                    expandStringSet(d.Get("system_packages").(*schema.Set)),
+		UseEbsOptimizedInstances:    aws.Bool(d.Get("use_ebs_optimized_instances").(bool)),
+		Attributes:                  lt.AttributeMap(d),
+		VolumeConfigurations:        lt.VolumeConfigurations(d),
 	}
 
 	if lt.CustomShortName {
