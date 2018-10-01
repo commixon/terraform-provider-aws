@@ -182,6 +182,7 @@ func Provider() terraform.ResourceProvider {
 			"aws_cognito_user_pools":               dataSourceAwsCognitoUserPools(),
 			"aws_codecommit_repository":            dataSourceAwsCodeCommitRepository(),
 			"aws_db_cluster_snapshot":              dataSourceAwsDbClusterSnapshot(),
+			"aws_db_event_categories":              dataSourceAwsDbEventCategories(),
 			"aws_db_instance":                      dataSourceAwsDbInstance(),
 			"aws_db_snapshot":                      dataSourceAwsDbSnapshot(),
 			"aws_dx_gateway":                       dataSourceAwsDxGateway(),
@@ -669,6 +670,7 @@ func Provider() terraform.ResourceProvider {
 			"aws_batch_compute_environment":                    resourceAwsBatchComputeEnvironment(),
 			"aws_batch_job_definition":                         resourceAwsBatchJobDefinition(),
 			"aws_batch_job_queue":                              resourceAwsBatchJobQueue(),
+			"aws_pinpoint_app":                                 resourceAwsPinpointApp(),
 
 			// ALBs are actually LBs because they can be type `network` or `application`
 			// To avoid regressions, we will add a new resource for each and they both point
