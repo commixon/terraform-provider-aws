@@ -79,6 +79,28 @@ func TestAccAWSLaunchTemplate_basic(t *testing.T) {
 	})
 }
 
+func TestAccAWSLaunchTemplate_disappears(t *testing.T) {
+	var launchTemplate ec2.LaunchTemplate
+	resourceName := "aws_launch_template.foo"
+	rInt := acctest.RandInt()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSLaunchTemplateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSLaunchTemplateConfig_basic(rInt),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &launchTemplate),
+					testAccCheckAWSLaunchTemplateDisappears(&launchTemplate),
+				),
+				ExpectNonEmptyPlan: true,
+			},
+		},
+	})
+}
+
 func TestAccAWSLaunchTemplate_BlockDeviceMappings_EBS(t *testing.T) {
 	var template ec2.LaunchTemplate
 	rName := acctest.RandomWithPrefix("tf-acc-test")
@@ -144,6 +166,60 @@ func TestAccAWSLaunchTemplate_BlockDeviceMappings_EBS_DeleteOnTermination(t *tes
 				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccAWSLaunchTemplate_EbsOptimized(t *testing.T) {
+	var template ec2.LaunchTemplate
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+	resourceName := "aws_launch_template.test"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSLaunchTemplateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSLaunchTemplateConfig_EbsOptimized(rName, "true"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &template),
+					resource.TestCheckResourceAttr(resourceName, "ebs_optimized", "true"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			{
+				Config: testAccAWSLaunchTemplateConfig_EbsOptimized(rName, "false"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &template),
+					resource.TestCheckResourceAttr(resourceName, "ebs_optimized", "false"),
+				),
+			},
+			{
+				Config: testAccAWSLaunchTemplateConfig_EbsOptimized(rName, "\"true\""),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &template),
+					resource.TestCheckResourceAttr(resourceName, "ebs_optimized", "true"),
+				),
+			},
+			{
+				Config: testAccAWSLaunchTemplateConfig_EbsOptimized(rName, "\"false\""),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &template),
+					resource.TestCheckResourceAttr(resourceName, "ebs_optimized", "false"),
+				),
+			},
+			{
+				Config: testAccAWSLaunchTemplateConfig_EbsOptimized(rName, "\"\""),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSLaunchTemplateExists(resourceName, &template),
+					resource.TestCheckResourceAttr(resourceName, "ebs_optimized", ""),
+				),
 			},
 		},
 	})
@@ -475,6 +551,20 @@ func testAccCheckAWSLaunchTemplateDestroy(s *terraform.State) error {
 	return nil
 }
 
+func testAccCheckAWSLaunchTemplateDisappears(launchTemplate *ec2.LaunchTemplate) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		conn := testAccProvider.Meta().(*AWSClient).ec2conn
+
+		input := &ec2.DeleteLaunchTemplateInput{
+			LaunchTemplateId: launchTemplate.LaunchTemplateId,
+		}
+
+		_, err := conn.DeleteLaunchTemplate(input)
+
+		return err
+	}
+}
+
 func testAccAWSLaunchTemplateConfig_basic(rInt int) string {
 	return fmt.Sprintf(`
 resource "aws_launch_template" "foo" {
@@ -596,6 +686,15 @@ resource "aws_autoscaling_group" "test" {
   }
 }
 `, rName, deleteOnTermination, rName)
+}
+
+func testAccAWSLaunchTemplateConfig_EbsOptimized(rName, ebsOptimized string) string {
+	return fmt.Sprintf(`
+resource "aws_launch_template" "test" {
+  ebs_optimized = %s # allows "", false, true, "false", "true" values
+  name          = %q
+}
+`, ebsOptimized, rName)
 }
 
 func testAccAWSLaunchTemplateConfig_data(rInt int) string {
