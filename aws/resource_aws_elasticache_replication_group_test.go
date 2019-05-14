@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strings"
 	"testing"
 	"time"
 
@@ -31,12 +30,6 @@ func testSweepElasticacheReplicationGroups(region string) error {
 	}
 	conn := client.(*AWSClient).elasticacheconn
 
-	prefixes := []string{
-		"tf-",
-		"tf-test-",
-		"tf-acc-test-",
-	}
-
 	err = conn.DescribeReplicationGroupsPages(&elasticache.DescribeReplicationGroupsInput{}, func(page *elasticache.DescribeReplicationGroupsOutput, isLast bool) bool {
 		if len(page.ReplicationGroups) == 0 {
 			log.Print("[DEBUG] No Elasticache Replicaton Groups to sweep")
@@ -45,17 +38,7 @@ func testSweepElasticacheReplicationGroups(region string) error {
 
 		for _, replicationGroup := range page.ReplicationGroups {
 			id := aws.StringValue(replicationGroup.ReplicationGroupId)
-			skip := true
-			for _, prefix := range prefixes {
-				if strings.HasPrefix(id, prefix) {
-					skip = false
-					break
-				}
-			}
-			if skip {
-				log.Printf("[INFO] Skipping Elasticache Replication Group: %s", id)
-				continue
-			}
+
 			log.Printf("[INFO] Deleting Elasticache Replication Group: %s", id)
 			err := deleteElasticacheReplicationGroup(id, conn)
 			if err != nil {
@@ -614,10 +597,9 @@ func TestAccAWSElasticacheReplicationGroup_NumberCacheClusters_Failover_AutoFail
 				PreConfig: func() {
 					// Simulate failover so primary is on node we are trying to delete
 					conn := testAccProvider.Meta().(*AWSClient).elasticacheconn
-					var input *elasticache.ModifyReplicationGroupInput
 
 					// Must disable automatic failover first
-					input = &elasticache.ModifyReplicationGroupInput{
+					var input *elasticache.ModifyReplicationGroupInput = &elasticache.ModifyReplicationGroupInput{
 						ApplyImmediately:         aws.Bool(true),
 						AutomaticFailoverEnabled: aws.Bool(false),
 						ReplicationGroupId:       aws.String(rName),
@@ -1437,7 +1419,7 @@ resource "aws_subnet" "test" {
 
 resource "aws_elasticache_subnet_group" "test" {
   name       = "%[1]s"
-  subnet_ids = ["${aws_subnet.test.*.id}"]
+  subnet_ids = ["${aws_subnet.test.*.id[0]}", "${aws_subnet.test.*.id[1]}"]
 }
 
 resource "aws_elasticache_replication_group" "test" {
