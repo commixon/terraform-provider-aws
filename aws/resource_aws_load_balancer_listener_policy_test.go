@@ -18,7 +18,7 @@ func TestAccAWSLoadBalancerListenerPolicy_basic(t *testing.T) {
 	rChar := acctest.RandStringFromCharSet(6, acctest.CharSetAlpha)
 	lbName := fmt.Sprintf("%s", rChar)
 	mcName := fmt.Sprintf("%s", rChar)
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSLoadBalancerListenerPolicyDestroy,
@@ -159,7 +159,7 @@ resource "aws_elb" "test-lb" {
     lb_protocol = "http"
   }
 
-  tags {
+  tags = {
     Name = "tf-acc-test"
   }
 }
@@ -196,7 +196,7 @@ resource "aws_elb" "test-lb" {
     lb_protocol = "http"
   }
 
-  tags {
+  tags = {
     Name = "tf-acc-test"
   }
 }
@@ -233,7 +233,7 @@ resource "aws_elb" "test-lb" {
     lb_protocol = "http"
   }
 
-  tags {
+  tags = {
     Name = "tf-acc-test"
   }
 }`, lbName)

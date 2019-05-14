@@ -81,18 +81,51 @@ func testSweepDbInstances(region string) error {
 	return nil
 }
 
-func TestAccAWSDBInstance_importBasic(t *testing.T) {
+func TestAccAWSDBInstance_basic(t *testing.T) {
+	var dbInstance1 rds.DBInstance
 	resourceName := "aws_db_instance.bar"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccAWSDBInstanceConfig,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSDBInstanceExists(resourceName, &dbInstance1),
+					testAccCheckAWSDBInstanceAttributes(&dbInstance1),
+					resource.TestCheckResourceAttr(resourceName, "allocated_storage", "10"),
+					resource.TestCheckResourceAttr(resourceName, "auto_minor_version_upgrade", "true"),
+					testAccMatchResourceAttrRegionalARN(resourceName, "arn", "rds", regexp.MustCompile(`db:.+`)),
+					resource.TestCheckResourceAttrSet(resourceName, "availability_zone"),
+					resource.TestCheckResourceAttr(resourceName, "backup_retention_period", "0"),
+					resource.TestCheckResourceAttrSet(resourceName, "backup_window"),
+					resource.TestCheckResourceAttrSet(resourceName, "ca_cert_identifier"),
+					resource.TestCheckResourceAttr(resourceName, "copy_tags_to_snapshot", "false"),
+					resource.TestCheckResourceAttr(resourceName, "db_subnet_group_name", "default"),
+					resource.TestCheckResourceAttr(resourceName, "deletion_protection", "false"),
+					resource.TestCheckResourceAttr(resourceName, "enabled_cloudwatch_logs_exports.#", "0"),
+					resource.TestCheckResourceAttrSet(resourceName, "endpoint"),
+					resource.TestCheckResourceAttr(resourceName, "engine", "mysql"),
+					resource.TestCheckResourceAttrSet(resourceName, "engine_version"),
+					resource.TestCheckResourceAttrSet(resourceName, "hosted_zone_id"),
+					resource.TestCheckResourceAttr(resourceName, "iam_database_authentication_enabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "instance_class", "db.t2.micro"),
+					resource.TestCheckResourceAttr(resourceName, "license_model", "general-public-license"),
+					resource.TestCheckResourceAttrSet(resourceName, "maintenance_window"),
+					resource.TestCheckResourceAttr(resourceName, "name", "baz"),
+					resource.TestCheckResourceAttr(resourceName, "option_group_name", "default:mysql-5-6"),
+					resource.TestCheckResourceAttr(resourceName, "parameter_group_name", "default.mysql5.6"),
+					resource.TestCheckResourceAttr(resourceName, "port", "3306"),
+					resource.TestCheckResourceAttr(resourceName, "publicly_accessible", "false"),
+					resource.TestCheckResourceAttrSet(resourceName, "resource_id"),
+					resource.TestCheckResourceAttr(resourceName, "status", "available"),
+					resource.TestCheckResourceAttr(resourceName, "storage_encrypted", "false"),
+					resource.TestCheckResourceAttr(resourceName, "tags.%", "0"),
+					resource.TestCheckResourceAttr(resourceName, "username", "foo"),
+				),
 			},
-
 			{
 				ResourceName:      resourceName,
 				ImportState:       true,
@@ -107,51 +140,10 @@ func TestAccAWSDBInstance_importBasic(t *testing.T) {
 	})
 }
 
-func TestAccAWSDBInstance_basic(t *testing.T) {
-	var v rds.DBInstance
-
-	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccPreCheck(t) },
-		Providers:    testAccProviders,
-		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
-		Steps: []resource.TestStep{
-			{
-				Config: testAccAWSDBInstanceConfig,
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckAWSDBInstanceExists("aws_db_instance.bar", &v),
-					testAccCheckAWSDBInstanceAttributes(&v),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "allocated_storage", "10"),
-					resource.TestMatchResourceAttr("aws_db_instance.bar", "arn", regexp.MustCompile(`^arn:[^:]+:rds:[^:]+:\d{12}:db:.+`)),
-					resource.TestCheckResourceAttr("aws_db_instance.bar", "deletion_protection", "false"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "engine", "mysql"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "license_model", "general-public-license"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "instance_class", "db.t2.micro"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "name", "baz"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "username", "foo"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "parameter_group_name", "default.mysql5.6"),
-					resource.TestCheckResourceAttr(
-						"aws_db_instance.bar", "enabled_cloudwatch_logs_exports.#", "0"),
-					resource.TestCheckResourceAttrSet("aws_db_instance.bar", "hosted_zone_id"),
-					resource.TestCheckResourceAttrSet("aws_db_instance.bar", "ca_cert_identifier"),
-					resource.TestCheckResourceAttrSet(
-						"aws_db_instance.bar", "resource_id"),
-				),
-			},
-		},
-	})
-}
-
 func TestAccAWSDBInstance_namePrefix(t *testing.T) {
 	var v rds.DBInstance
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -172,7 +164,7 @@ func TestAccAWSDBInstance_namePrefix(t *testing.T) {
 func TestAccAWSDBInstance_generatedName(t *testing.T) {
 	var v rds.DBInstance
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -195,7 +187,7 @@ func TestAccAWSDBInstance_kmsKey(t *testing.T) {
 	ri := acctest.RandInt()
 	config := fmt.Sprintf(testAccAWSDBInstanceConfigKmsKeyId, ri)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -217,7 +209,7 @@ func TestAccAWSDBInstance_subnetGroup(t *testing.T) {
 	var v rds.DBInstance
 	rName := acctest.RandString(10)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -247,7 +239,7 @@ func TestAccAWSDBInstance_optionGroup(t *testing.T) {
 
 	rName := fmt.Sprintf("tf-option-test-%d", acctest.RandInt())
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -268,7 +260,7 @@ func TestAccAWSDBInstance_optionGroup(t *testing.T) {
 func TestAccAWSDBInstance_iamAuth(t *testing.T) {
 	var v rds.DBInstance
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -292,7 +284,7 @@ func TestAccAWSDBInstance_DeletionProtection(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -330,7 +322,7 @@ func TestAccAWSDBInstance_FinalSnapshotIdentifier(t *testing.T) {
 	var snap rds.DBInstance
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		// testAccCheckAWSDBInstanceSnapshot verifies a database snapshot is
@@ -350,7 +342,7 @@ func TestAccAWSDBInstance_FinalSnapshotIdentifier(t *testing.T) {
 func TestAccAWSDBInstance_FinalSnapshotIdentifier_SkipFinalSnapshot(t *testing.T) {
 	var snap rds.DBInstance
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceNoSnapshot,
@@ -371,7 +363,7 @@ func TestAccAWSDBInstance_IsAlreadyBeingDeleted(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -409,7 +401,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -433,7 +425,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_AllocatedStorage(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -458,7 +450,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_AutoMinorVersionUpgrade(t *testing.T
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -483,7 +475,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_AvailabilityZone(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -507,7 +499,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_BackupRetentionPeriod(t *testing.T) 
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -532,7 +524,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_BackupWindow(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -569,7 +561,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_DeletionProtection(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -604,7 +596,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_IamDatabaseAuthenticationEnabled(t *
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -629,7 +621,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_MaintenanceWindow(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -654,7 +646,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_Monitoring(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -679,7 +671,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_MultiAZ(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -704,7 +696,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_ParameterGroupName(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -730,7 +722,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_Port(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -755,7 +747,7 @@ func TestAccAWSDBInstance_ReplicateSourceDb_VpcSecurityGroupIds(t *testing.T) {
 	sourceResourceName := "aws_db_instance.source"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -779,7 +771,7 @@ func TestAccAWSDBInstance_S3Import(t *testing.T) {
 	uniqueId := acctest.RandomWithPrefix("tf-acc-s3-import-test")
 	bucketPrefix := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -803,7 +795,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -829,7 +821,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_AllocatedStorage(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -856,7 +848,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_AutoMinorVersionUpgrade(t *testing.
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -883,7 +875,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_AvailabilityZone(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -909,7 +901,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_BackupRetentionPeriod(t *testing.T)
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -936,7 +928,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_BackupRetentionPeriod_Unset(t *test
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -963,7 +955,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_BackupWindow(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -990,7 +982,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_DeletionProtection(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1027,7 +1019,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_IamDatabaseAuthenticationEnabled(t 
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1054,7 +1046,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_MaintenanceWindow(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1081,7 +1073,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_Monitoring(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1108,7 +1100,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_MultiAZ(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1135,7 +1127,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_MultiAZ_SQLServer(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1162,7 +1154,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_ParameterGroupName(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1190,7 +1182,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_Port(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1217,7 +1209,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_Tags(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1249,7 +1241,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_Tags_Unset(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1276,7 +1268,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_VpcSecurityGroupIds(t *testing.T) {
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1306,7 +1298,7 @@ func TestAccAWSDBInstance_SnapshotIdentifier_VpcSecurityGroupIds_Tags(t *testing
 	snapshotResourceName := "aws_db_snapshot.test"
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1329,7 +1321,7 @@ func TestAccAWSDBInstance_enhancedMonitoring(t *testing.T) {
 	var dbInstance rds.DBInstance
 	rName := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1354,7 +1346,7 @@ func TestAccAWSDBInstance_separate_iops_update(t *testing.T) {
 
 	rName := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1383,7 +1375,7 @@ func TestAccAWSDBInstance_portUpdate(t *testing.T) {
 
 	rName := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1413,7 +1405,7 @@ func TestAccAWSDBInstance_MSSQL_TZ(t *testing.T) {
 	var v rds.DBInstance
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1449,7 +1441,7 @@ func TestAccAWSDBInstance_MSSQL_Domain(t *testing.T) {
 	var vBefore, vAfter rds.DBInstance
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1484,7 +1476,7 @@ func TestAccAWSDBInstance_MSSQL_DomainSnapshotRestore(t *testing.T) {
 	var v, vRestoredInstance rds.DBInstance
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1508,7 +1500,7 @@ func TestAccAWSDBInstance_MSSQL_DomainSnapshotRestore(t *testing.T) {
 func TestAccAWSDBInstance_MinorVersion(t *testing.T) {
 	var v rds.DBInstance
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1528,7 +1520,7 @@ func TestAccAWSDBInstance_diffSuppressInitialState(t *testing.T) {
 	var v rds.DBInstance
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1552,7 +1544,7 @@ func TestAccAWSDBInstance_ec2Classic(t *testing.T) {
 
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t); testAccEC2ClassicPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1572,7 +1564,7 @@ func TestAccAWSDBInstance_cloudwatchLogsExportConfiguration(t *testing.T) {
 
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1598,7 +1590,7 @@ func TestAccAWSDBInstance_cloudwatchLogsExportConfigurationUpdate(t *testing.T) 
 
 	rInt := acctest.RandInt()
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1655,7 +1647,7 @@ func TestAccAWSDBInstance_EnabledCloudwatchLogsExports_Oracle(t *testing.T) {
 	rName := acctest.RandomWithPrefix("tf-acc-test")
 	resourceName := "aws_db_instance.test"
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
@@ -1665,6 +1657,34 @@ func TestAccAWSDBInstance_EnabledCloudwatchLogsExports_Oracle(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckAWSDBInstanceExists(resourceName, &dbInstance),
 					resource.TestCheckResourceAttr(resourceName, "enabled_cloudwatch_logs_exports.#", "3"),
+				),
+			},
+			{
+				ResourceName:            resourceName,
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
+			},
+		},
+	})
+}
+
+func TestAccAWSDBInstance_EnabledCloudwatchLogsExports_Postgresql(t *testing.T) {
+	var dbInstance rds.DBInstance
+
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+	resourceName := "aws_db_instance.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSDBInstanceConfig_EnabledCloudwatchLogsExports_Postgresql(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSDBInstanceExists(resourceName, &dbInstance),
+					resource.TestCheckResourceAttr(resourceName, "enabled_cloudwatch_logs_exports.#", "2"),
 				),
 			},
 			{
@@ -2176,7 +2196,7 @@ resource "aws_iam_policy_attachment" "test-attach" {
 //  Make sure EVERYTHING required is here...
 resource "aws_vpc" "foo" {
 	cidr_block = "10.1.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-db-instance-with-subnet-group"
 	}
 }
@@ -2185,7 +2205,7 @@ resource "aws_subnet" "foo" {
 	cidr_block = "10.1.1.0/24"
 	availability_zone = "us-west-2a"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-1"
 	}
 }
@@ -2194,7 +2214,7 @@ resource "aws_subnet" "bar" {
 	cidr_block = "10.1.2.0/24"
 	availability_zone = "us-west-2b"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-2"
 	}
 }
@@ -2202,7 +2222,7 @@ resource "aws_subnet" "bar" {
 resource "aws_db_subnet_group" "foo" {
 	name = "%s-subnet-group"
 	subnet_ids = ["${aws_subnet.foo.id}", "${aws_subnet.bar.id}"]
-	tags {
+	tags = {
 		Name = "tf-dbsubnet-group-test"
 	}
 }
@@ -2258,7 +2278,7 @@ resource "aws_db_instance" "snapshot" {
 
 	copy_tags_to_snapshot = true
 	final_snapshot_identifier = "foobarbaz-test-terraform-final-snapshot-%d"
-	tags {
+	tags = {
 		Name = "tf-tags-db"
 	}
 }
@@ -2416,7 +2436,7 @@ func testAccAWSDBInstanceConfigWithSubnetGroup(rName string) string {
 	return fmt.Sprintf(`
 resource "aws_vpc" "foo" {
 	cidr_block = "10.1.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-db-instance-with-subnet-group"
 	}
 }
@@ -2425,7 +2445,7 @@ resource "aws_subnet" "foo" {
 	cidr_block = "10.1.1.0/24"
 	availability_zone = "us-west-2a"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-1"
 	}
 }
@@ -2434,7 +2454,7 @@ resource "aws_subnet" "bar" {
 	cidr_block = "10.1.2.0/24"
 	availability_zone = "us-west-2b"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-2"
 	}
 }
@@ -2442,7 +2462,7 @@ resource "aws_subnet" "bar" {
 resource "aws_db_subnet_group" "foo" {
 	name = "foo-%s"
 	subnet_ids = ["${aws_subnet.foo.id}", "${aws_subnet.bar.id}"]
-	tags {
+	tags = {
 		Name = "tf-dbsubnet-group-test"
 	}
 }
@@ -2470,14 +2490,14 @@ func testAccAWSDBInstanceConfigWithSubnetGroupUpdated(rName string) string {
 	return fmt.Sprintf(`
 resource "aws_vpc" "foo" {
 	cidr_block = "10.1.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-db-instance-with-subnet-group-updated-foo"
 	}
 }
 
 resource "aws_vpc" "bar" {
 	cidr_block = "10.10.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-db-instance-with-subnet-group-updated-bar"
 	}
 }
@@ -2486,7 +2506,7 @@ resource "aws_subnet" "foo" {
 	cidr_block = "10.1.1.0/24"
 	availability_zone = "us-west-2a"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-1"
 	}
 }
@@ -2495,7 +2515,7 @@ resource "aws_subnet" "bar" {
 	cidr_block = "10.1.2.0/24"
 	availability_zone = "us-west-2b"
 	vpc_id = "${aws_vpc.foo.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-2"
 	}
 }
@@ -2504,7 +2524,7 @@ resource "aws_subnet" "test" {
 	cidr_block = "10.10.3.0/24"
 	availability_zone = "us-west-2b"
 	vpc_id = "${aws_vpc.bar.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-3"
 	}
 }
@@ -2513,7 +2533,7 @@ resource "aws_subnet" "another_test" {
 	cidr_block = "10.10.4.0/24"
 	availability_zone = "us-west-2a"
 	vpc_id = "${aws_vpc.bar.id}"
-	tags {
+	tags = {
 		Name = "tf-acc-db-instance-with-subnet-group-4"
 	}
 }
@@ -2521,7 +2541,7 @@ resource "aws_subnet" "another_test" {
 resource "aws_db_subnet_group" "foo" {
 	name = "foo-%s"
 	subnet_ids = ["${aws_subnet.foo.id}", "${aws_subnet.bar.id}"]
-	tags {
+	tags = {
 		Name = "tf-dbsubnet-group-test"
 	}
 }
@@ -2529,7 +2549,7 @@ resource "aws_db_subnet_group" "foo" {
 resource "aws_db_subnet_group" "bar" {
 	name = "bar-%s"
 	subnet_ids = ["${aws_subnet.test.id}", "${aws_subnet.another_test.id}"]
-	tags {
+	tags = {
 		Name = "tf-dbsubnet-group-test-updated"
 	}
 }
@@ -2559,7 +2579,7 @@ func testAccAWSDBMSSQL_timezone(rInt int) string {
 resource "aws_vpc" "foo" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "terraform-testacc-db-instance-mssql-timezone"
   }
 }
@@ -2575,7 +2595,7 @@ resource "aws_subnet" "main" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2a"
   cidr_block        = "10.1.1.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-timezone-main"
   }
 }
@@ -2584,7 +2604,7 @@ resource "aws_subnet" "other" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2b"
   cidr_block        = "10.1.2.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-timezone-other"
   }
 }
@@ -2631,7 +2651,7 @@ func testAccAWSDBMSSQL_timezone_AKST(rInt int) string {
 resource "aws_vpc" "foo" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "terraform-testacc-db-instance-mssql-timezone-akst"
   }
 }
@@ -2647,7 +2667,7 @@ resource "aws_subnet" "main" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2a"
   cidr_block        = "10.1.1.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-timezone-akst-main"
   }
 }
@@ -2656,7 +2676,7 @@ resource "aws_subnet" "other" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2b"
   cidr_block        = "10.1.2.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-timezone-akst-other"
   }
 }
@@ -2704,7 +2724,7 @@ func testAccAWSDBMSSQLDomain(rInt int) string {
 resource "aws_vpc" "foo" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "terraform-testacc-db-instance-mssql-domain"
   }
 }
@@ -2720,7 +2740,7 @@ resource "aws_subnet" "main" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2a"
   cidr_block        = "10.1.1.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-main"
   }
 }
@@ -2729,7 +2749,7 @@ resource "aws_subnet" "other" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2b"
   cidr_block        = "10.1.2.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-other"
   }
 }
@@ -2826,7 +2846,7 @@ func testAccAWSDBMSSQLUpdateDomain(rInt int) string {
 resource "aws_vpc" "foo" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "terraform-testacc-db-instance-mssql-domain"
   }
 }
@@ -2842,7 +2862,7 @@ resource "aws_subnet" "main" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2a"
   cidr_block        = "10.1.1.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-main"
   }
 }
@@ -2851,7 +2871,7 @@ resource "aws_subnet" "other" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2b"
   cidr_block        = "10.1.2.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-other"
   }
 }
@@ -2949,7 +2969,7 @@ func testAccAWSDBMSSQLDomainSnapshotRestore(rInt int) string {
 resource "aws_vpc" "foo" {
   cidr_block           = "10.1.0.0/16"
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "terraform-testacc-db-instance-mssql-domain"
   }
 }
@@ -2965,7 +2985,7 @@ resource "aws_subnet" "main" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2a"
   cidr_block        = "10.1.1.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-main"
   }
 }
@@ -2974,7 +2994,7 @@ resource "aws_subnet" "other" {
   vpc_id            = "${aws_vpc.foo.id}"
   availability_zone = "us-west-2b"
   cidr_block        = "10.1.2.0/24"
-  tags {
+  tags = {
     Name = "tf-acc-db-instance-mssql-domain-other"
   }
 }
@@ -3091,7 +3111,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfiguration(rInt int) strin
 	resource "aws_vpc" "foo" {
 		cidr_block           = "10.1.0.0/16"
 		enable_dns_hostnames = true
-		tags {
+	tags = {
 		  Name = "terraform-testacc-db-instance-enable-cloudwatch"
 		}
 	  }
@@ -3107,7 +3127,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfiguration(rInt int) strin
 		vpc_id            = "${aws_vpc.foo.id}"
 		availability_zone = "us-west-2a"
 		cidr_block        = "10.1.1.0/24"
-		tags {
+	tags = {
 		  Name = "tf-acc-db-instance-enable-cloudwatch-main"
 		}
 	  }
@@ -3116,7 +3136,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfiguration(rInt int) strin
 		vpc_id            = "${aws_vpc.foo.id}"
 		availability_zone = "us-west-2b"
 		cidr_block        = "10.1.2.0/24"
-		tags {
+	tags = {
 		  Name = "tf-acc-db-instance-enable-cloudwatch-other"
 		}
 	  }
@@ -3148,7 +3168,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationAdd(rInt int) st
 		resource "aws_vpc" "foo" {
 			cidr_block           = "10.1.0.0/16"
 			enable_dns_hostnames = true
-			tags {
+	tags = {
 			  Name = "terraform-testacc-db-instance-enable-cloudwatch"
 			}
 		  }
@@ -3164,7 +3184,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationAdd(rInt int) st
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2a"
 			cidr_block        = "10.1.1.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-main"
 			}
 		  }
@@ -3173,7 +3193,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationAdd(rInt int) st
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2b"
 			cidr_block        = "10.1.2.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-other"
 			}
 		  }
@@ -3208,7 +3228,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationModify(rInt int)
 		resource "aws_vpc" "foo" {
 			cidr_block           = "10.1.0.0/16"
 			enable_dns_hostnames = true
-			tags {
+	tags = {
 			  Name = "terraform-testacc-db-instance-enable-cloudwatch"
 			}
 		  }
@@ -3224,7 +3244,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationModify(rInt int)
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2a"
 			cidr_block        = "10.1.1.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-main"
 			}
 		  }
@@ -3233,7 +3253,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationModify(rInt int)
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2b"
 			cidr_block        = "10.1.2.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-other"
 			}
 		  }
@@ -3268,7 +3288,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationDelete(rInt int)
 		resource "aws_vpc" "foo" {
 			cidr_block           = "10.1.0.0/16"
 			enable_dns_hostnames = true
-			tags {
+	tags = {
 			  Name = "terraform-testacc-db-instance-enable-cloudwatch"
 			}
 		  }
@@ -3284,7 +3304,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationDelete(rInt int)
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2a"
 			cidr_block        = "10.1.1.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-main"
 			}
 		  }
@@ -3293,7 +3313,7 @@ func testAccAWSDBInstanceConfigCloudwatchLogsExportConfigurationDelete(rInt int)
 			vpc_id            = "${aws_vpc.foo.id}"
 			availability_zone = "us-west-2b"
 			cidr_block        = "10.1.2.0/24"
-			tags {
+	tags = {
 			  Name = "tf-acc-db-instance-enable-cloudwatch-other"
 			}
 		  }
@@ -3393,6 +3413,21 @@ resource "aws_db_instance" "test" {
   allocated_storage               = 10
   enabled_cloudwatch_logs_exports = ["alert", "listener", "trace"]
   engine                          = "oracle-se"
+  identifier                      = %q
+  instance_class                  = "db.t2.micro"
+  password                        = "avoid-plaintext-passwords"
+  username                        = "tfacctest"
+  skip_final_snapshot             = true
+}
+`, rName)
+}
+
+func testAccAWSDBInstanceConfig_EnabledCloudwatchLogsExports_Postgresql(rName string) string {
+	return fmt.Sprintf(`
+resource "aws_db_instance" "test" {
+  allocated_storage               = 10
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  engine                          = "postgres"
   identifier                      = %q
   instance_class                  = "db.t2.micro"
   password                        = "avoid-plaintext-passwords"
@@ -4243,7 +4278,7 @@ resource "aws_db_instance" "test" {
   snapshot_identifier = "${aws_db_snapshot.test.id}"
   skip_final_snapshot = true
 
-  tags {
+  tags = {
     key1 = "value1"
   }
 }
@@ -4261,7 +4296,7 @@ resource "aws_db_instance" "source" {
   username            = "tfacctest"
   skip_final_snapshot = true
 
-  tags {
+  tags = {
     key1 = "value1"
   }
 }
@@ -4277,7 +4312,7 @@ resource "aws_db_instance" "test" {
   snapshot_identifier = "${aws_db_snapshot.test.id}"
   skip_final_snapshot = true
 
-  tags {}
+  tags = {}
 }
 `, rName, rName, rName)
 }
@@ -4351,7 +4386,7 @@ resource "aws_db_instance" "test" {
   skip_final_snapshot    = true
   vpc_security_group_ids = ["${aws_security_group.test.id}"]
 
-  tags {
+  tags = {
     key1 = "value1"
   }
 }

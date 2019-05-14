@@ -16,7 +16,7 @@ import (
 func TestAccAWSLBTargetGroupAttachment_basic(t *testing.T) {
 	targetGroupName := fmt.Sprintf("test-target-group-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:      func() { testAccPreCheck(t) },
 		IDRefreshName: "aws_lb_target_group.test",
 		Providers:     testAccProviders,
@@ -35,7 +35,7 @@ func TestAccAWSLBTargetGroupAttachment_basic(t *testing.T) {
 func TestAccAWSLBTargetGroupAttachmentBackwardsCompatibility(t *testing.T) {
 	targetGroupName := fmt.Sprintf("test-target-group-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:      func() { testAccPreCheck(t) },
 		IDRefreshName: "aws_alb_target_group.test",
 		Providers:     testAccProviders,
@@ -54,7 +54,7 @@ func TestAccAWSLBTargetGroupAttachmentBackwardsCompatibility(t *testing.T) {
 func TestAccAWSLBTargetGroupAttachment_withoutPort(t *testing.T) {
 	targetGroupName := fmt.Sprintf("test-target-group-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:      func() { testAccPreCheck(t) },
 		IDRefreshName: "aws_lb_target_group.test",
 		Providers:     testAccProviders,
@@ -73,7 +73,7 @@ func TestAccAWSLBTargetGroupAttachment_withoutPort(t *testing.T) {
 func TestAccAWSALBTargetGroupAttachment_ipAddress(t *testing.T) {
 	targetGroupName := fmt.Sprintf("test-target-group-%s", acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum))
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:      func() { testAccPreCheck(t) },
 		IDRefreshName: "aws_lb_target_group.test",
 		Providers:     testAccProviders,
@@ -208,14 +208,14 @@ resource "aws_lb_target_group" "test" {
 resource "aws_subnet" "subnet" {
   cidr_block = "10.0.1.0/24"
   vpc_id = "${aws_vpc.test.id}"
-  tags {
+  tags = {
     Name = "tf-acc-lb-target-group-attachment-without-port"
   }
 }
 
 resource "aws_vpc" "test" {
   cidr_block = "10.0.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-lb-target-group-attachment-without-port"
 	}
 }`, targetGroupName)
@@ -260,14 +260,14 @@ resource "aws_lb_target_group" "test" {
 resource "aws_subnet" "subnet" {
   cidr_block = "10.0.1.0/24"
   vpc_id = "${aws_vpc.test.id}"
-  tags {
+  tags = {
     Name = "tf-acc-lb-target-group-attachment-basic"
   }
 }
 
 resource "aws_vpc" "test" {
   cidr_block = "10.0.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-lb-target-group-attachment-basic"
 	}
 }`, targetGroupName)
@@ -312,14 +312,14 @@ resource "aws_alb_target_group" "test" {
 resource "aws_subnet" "subnet" {
   cidr_block = "10.0.1.0/24"
   vpc_id = "${aws_vpc.test.id}"
-  tags {
+  tags = {
     Name = "tf-acc-lb-target-group-attachment-bc"
   }
 }
 
 resource "aws_vpc" "test" {
   cidr_block = "10.0.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-lb-target-group-attachment-bc"
 	}
 }`, targetGroupName)
@@ -362,13 +362,13 @@ resource "aws_lb_target_group" "test" {
 resource "aws_subnet" "subnet" {
   cidr_block = "10.0.1.0/24"
   vpc_id = "${aws_vpc.test.id}"
-  tags {
+  tags = {
     Name = "tf-acc-lb-target-group-attachment-with-ip-address"
   }
 }
 resource "aws_vpc" "test" {
   cidr_block = "10.0.0.0/16"
-	tags {
+	tags = {
 		Name = "terraform-testacc-lb-target-group-attachment-with-ip-address"
 	}
 }`, targetGroupName)

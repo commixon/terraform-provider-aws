@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 
 	"os"
@@ -38,7 +39,7 @@ func TestAccAWSAcmCertificate_emailValidation(t *testing.T) {
 
 	domain := fmt.Sprintf("tf-acc-%d.%s", rInt1, rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -71,7 +72,7 @@ func TestAccAWSAcmCertificate_dnsValidation(t *testing.T) {
 
 	domain := fmt.Sprintf("tf-acc-%d.%s", rInt1, rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -103,7 +104,7 @@ func TestAccAWSAcmCertificate_dnsValidation(t *testing.T) {
 func TestAccAWSAcmCertificate_root(t *testing.T) {
 	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -132,11 +133,45 @@ func TestAccAWSAcmCertificate_root(t *testing.T) {
 	})
 }
 
+func TestAccAWSAcmCertificate_root_TrailingPeriod(t *testing.T) {
+	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
+	domain := fmt.Sprintf("%s.", rootDomain)
+	resourceName := "aws_acm_certificate.cert"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAcmCertificateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAcmCertificateConfig(domain, acm.ValidationMethodDns),
+				Check: resource.ComposeTestCheckFunc(
+					testAccMatchResourceAttrRegionalARN(resourceName, "arn", "acm", regexp.MustCompile(`certificate/.+`)),
+					resource.TestCheckResourceAttr(resourceName, "domain_name", strings.TrimSuffix(domain, ".")),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.0.domain_name", strings.TrimSuffix(domain, ".")),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.0.resource_record_name"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.0.resource_record_type", "CNAME"),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.0.resource_record_value"),
+					resource.TestCheckResourceAttr(resourceName, "subject_alternative_names.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "validation_emails.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "validation_method", acm.ValidationMethodDns),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccAWSAcmCertificate_rootAndWildcardSan(t *testing.T) {
 	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
 	wildcardDomain := fmt.Sprintf("*.%s", rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -178,7 +213,7 @@ func TestAccAWSAcmCertificate_san_single(t *testing.T) {
 	domain := fmt.Sprintf("tf-acc-%d.%s", rInt1, rootDomain)
 	sanDomain := fmt.Sprintf("tf-acc-%d-san.%s", rInt1, rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -221,7 +256,7 @@ func TestAccAWSAcmCertificate_san_multiple(t *testing.T) {
 	sanDomain1 := fmt.Sprintf("tf-acc-%d-san1.%s", rInt1, rootDomain)
 	sanDomain2 := fmt.Sprintf("tf-acc-%d-san2.%s", rInt1, rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -260,11 +295,54 @@ func TestAccAWSAcmCertificate_san_multiple(t *testing.T) {
 	})
 }
 
+func TestAccAWSAcmCertificate_san_TrailingPeriod(t *testing.T) {
+	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
+
+	rInt1 := acctest.RandInt()
+
+	domain := fmt.Sprintf("tf-acc-%d.%s", rInt1, rootDomain)
+	sanDomain := fmt.Sprintf("tf-acc-%d-san.%s.", rInt1, rootDomain)
+	resourceName := "aws_acm_certificate.cert"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAcmCertificateDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAcmCertificateConfig_subjectAlternativeNames(domain, strconv.Quote(sanDomain), acm.ValidationMethodDns),
+				Check: resource.ComposeTestCheckFunc(
+					testAccMatchResourceAttrRegionalARN(resourceName, "arn", "acm", regexp.MustCompile(`certificate/.+`)),
+					resource.TestCheckResourceAttr(resourceName, "domain_name", domain),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.0.domain_name", domain),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.0.resource_record_name"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.0.resource_record_type", "CNAME"),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.0.resource_record_value"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.1.domain_name", strings.TrimSuffix(sanDomain, ".")),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.1.resource_record_name"),
+					resource.TestCheckResourceAttr(resourceName, "domain_validation_options.1.resource_record_type", "CNAME"),
+					resource.TestCheckResourceAttrSet(resourceName, "domain_validation_options.1.resource_record_value"),
+					resource.TestCheckResourceAttr(resourceName, "subject_alternative_names.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "subject_alternative_names.0", strings.TrimSuffix(sanDomain, ".")),
+					resource.TestCheckResourceAttr(resourceName, "validation_emails.#", "0"),
+					resource.TestCheckResourceAttr(resourceName, "validation_method", acm.ValidationMethodDns),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccAWSAcmCertificate_wildcard(t *testing.T) {
 	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
 	wildcardDomain := fmt.Sprintf("*.%s", rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -297,7 +375,7 @@ func TestAccAWSAcmCertificate_wildcardAndRootSan(t *testing.T) {
 	rootDomain := testAccAwsAcmCertificateDomainFromEnv(t)
 	wildcardDomain := fmt.Sprintf("*.%s", rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -338,7 +416,7 @@ func TestAccAWSAcmCertificate_tags(t *testing.T) {
 
 	domain := fmt.Sprintf("tf-acc-%d.%s", rInt1, rootDomain)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAcmCertificateDestroy,
@@ -407,7 +485,7 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = "%s"
   validation_method = "%s"
 
-  tags {
+  tags = {
     "%s" = "%s"
   }
 }
@@ -420,7 +498,7 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = "%s"
   validation_method = "%s"
 
-  tags {
+  tags = {
     "%s" = "%s"
     "%s" = "%s"
   }

@@ -31,7 +31,7 @@ func TestAccAWSS3BucketObject_source(t *testing.T) {
 	}
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -48,7 +48,7 @@ func TestAccAWSS3BucketObject_content(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -81,7 +81,7 @@ func TestAccAWSS3BucketObject_contentBase64(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -126,7 +126,7 @@ func TestAccAWSS3BucketObject_withContentCharacteristics(t *testing.T) {
 
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -159,7 +159,7 @@ func TestAccAWSS3BucketObject_updates(t *testing.T) {
 	}
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -203,7 +203,7 @@ func TestAccAWSS3BucketObject_updatesWithVersioning(t *testing.T) {
 
 	var originalObj, modifiedObj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -320,7 +320,7 @@ func TestAccAWSS3BucketObject_kms(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -350,7 +350,7 @@ func TestAccAWSS3BucketObject_sse(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -375,7 +375,7 @@ func TestAccAWSS3BucketObject_acl(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -445,7 +445,7 @@ func TestAccAWSS3BucketObject_storageClass(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -479,6 +479,34 @@ func TestAccAWSS3BucketObject_storageClass(t *testing.T) {
 					testAccCheckAWSS3BucketObjectStorageClass(
 						"aws_s3_bucket_object.object",
 						"REDUCED_REDUNDANCY"),
+				),
+			},
+			{
+				Config: testAccAWSS3BucketObjectConfig_storageClass(rInt, "GLACIER"),
+				Check: resource.ComposeTestCheckFunc(
+					// Can't GetObject on an object in Glacier without restoring it.
+					resource.TestCheckResourceAttr(
+						"aws_s3_bucket_object.object",
+						"storage_class",
+						"GLACIER"),
+					testAccCheckAWSS3BucketObjectStorageClass(
+						"aws_s3_bucket_object.object",
+						"GLACIER"),
+				),
+			},
+			{
+				Config: testAccAWSS3BucketObjectConfig_storageClass(rInt, "INTELLIGENT_TIERING"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSS3BucketObjectExists(
+						"aws_s3_bucket_object.object",
+						&obj),
+					resource.TestCheckResourceAttr(
+						"aws_s3_bucket_object.object",
+						"storage_class",
+						"INTELLIGENT_TIERING"),
+					testAccCheckAWSS3BucketObjectStorageClass(
+						"aws_s3_bucket_object.object",
+						"INTELLIGENT_TIERING"),
 				),
 			},
 		},
@@ -547,7 +575,7 @@ func TestAccAWSS3BucketObject_tags(t *testing.T) {
 	rInt := acctest.RandInt()
 	var obj s3.GetObjectOutput
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckAWSS3BucketObjectDestroy,
@@ -733,7 +761,7 @@ resource "aws_s3_bucket_object" "object" {
 	bucket = "${aws_s3_bucket.object_bucket_2.bucket}"
 	key = "test-key"
 	content = "stuff"
-	tags {
+	tags = {
 		Key1 = "Value One"
 		Description = "Very interesting"
 	}

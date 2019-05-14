@@ -13,7 +13,7 @@ func TestAccAWSCloudFormationStack_dataSource_basic(t *testing.T) {
 	rString := acctest.RandString(8)
 	stackName := fmt.Sprintf("tf-acc-ds-basic-%s", rString)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
@@ -72,7 +72,7 @@ resource "aws_cloudformation_stack" "cfs" {
   }
 }
 STACK
-  tags {
+  tags = {
     Name = "Form the Cloud"
     Second = "meh"
   }
@@ -88,7 +88,7 @@ func TestAccAWSCloudFormationStack_dataSource_yaml(t *testing.T) {
 	rString := acctest.RandString(8)
 	stackName := fmt.Sprintf("tf-acc-ds-yaml-%s", rString)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:  func() { testAccPreCheck(t) },
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
@@ -141,7 +141,7 @@ Outputs:
     Value: !Ref myvpc
     Description: VPC ID
 STACK
-  tags {
+  tags = {
     Name = "Form the Cloud"
     Second = "meh"
   }

@@ -16,7 +16,7 @@ import (
 func TestAccAWSServiceCatalogPortfolioBasic(t *testing.T) {
 	name := acctest.RandString(5)
 	var dpo servicecatalog.DescribePortfolioOutput
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckServiceCatlaogPortfolioDestroy,
@@ -68,7 +68,7 @@ func TestAccAWSServiceCatalogPortfolioBasic(t *testing.T) {
 func TestAccAWSServiceCatalogPortfolioDisappears(t *testing.T) {
 	name := acctest.RandString(5)
 	var dpo servicecatalog.DescribePortfolioOutput
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckServiceCatlaogPortfolioDestroy,
@@ -90,7 +90,7 @@ func TestAccAWSServiceCatalogPortfolioImport(t *testing.T) {
 
 	name := acctest.RandString(5)
 
-	resource.Test(t, resource.TestCase{
+	resource.ParallelTest(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckServiceCatlaogPortfolioDestroy,
@@ -174,7 +174,7 @@ resource "aws_servicecatalog_portfolio" "test" {
   name = "%s"
   description = "test-2"
   provider_name = "test-3"
-  tags {
+  tags = {
     Key1 = "Value One"
   }
 }
@@ -187,7 +187,7 @@ resource "aws_servicecatalog_portfolio" "test" {
   name = "%s"
   description = "test-b"
   provider_name = "test-c"
-  tags {
+  tags = {
     Key1 = "Value 1"
     Key2 = "Value Two"
   }
@@ -201,7 +201,7 @@ resource "aws_servicecatalog_portfolio" "test" {
   name = "%s"
   description = "test-only-change-me"
   provider_name = "test-c"
-  tags {
+  tags = {
     Key3 = "Value Three"
   }
 }

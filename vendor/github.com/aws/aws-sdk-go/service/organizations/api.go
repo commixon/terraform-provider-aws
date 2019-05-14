@@ -17,7 +17,7 @@ const opAcceptHandshake = "AcceptHandshake"
 // AcceptHandshakeRequest generates a "aws/request.Request" representing the
 // client's request for the AcceptHandshake operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -261,7 +261,7 @@ const opAttachPolicy = "AttachPolicy"
 // AttachPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the AttachPolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -295,8 +295,7 @@ func (c *Organizations) AttachPolicyRequest(input *AttachPolicyInput) (req *requ
 
 	output = &AttachPolicyOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -568,7 +567,7 @@ const opCancelHandshake = "CancelHandshake"
 // CancelHandshakeRequest generates a "aws/request.Request" representing the
 // client's request for the CancelHandshake operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -742,7 +741,7 @@ const opCreateAccount = "CreateAccount"
 // CreateAccountRequest generates a "aws/request.Request" representing the
 // client's request for the CreateAccount operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1051,7 +1050,7 @@ const opCreateOrganization = "CreateOrganization"
 // CreateOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the CreateOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1320,7 +1319,7 @@ const opCreateOrganizationalUnit = "CreateOrganizationalUnit"
 // CreateOrganizationalUnitRequest generates a "aws/request.Request" representing the
 // client's request for the CreateOrganizationalUnit operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1586,7 +1585,7 @@ const opCreatePolicy = "CreatePolicy"
 // CreatePolicyRequest generates a "aws/request.Request" representing the
 // client's request for the CreatePolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -1859,7 +1858,7 @@ const opDeclineHandshake = "DeclineHandshake"
 // DeclineHandshakeRequest generates a "aws/request.Request" representing the
 // client's request for the DeclineHandshake operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2034,7 +2033,7 @@ const opDeleteOrganization = "DeleteOrganization"
 // DeleteOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2068,8 +2067,7 @@ func (c *Organizations) DeleteOrganizationRequest(input *DeleteOrganizationInput
 
 	output = &DeleteOrganizationOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -2199,7 +2197,7 @@ const opDeleteOrganizationalUnit = "DeleteOrganizationalUnit"
 // DeleteOrganizationalUnitRequest generates a "aws/request.Request" representing the
 // client's request for the DeleteOrganizationalUnit operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2233,8 +2231,7 @@ func (c *Organizations) DeleteOrganizationalUnitRequest(input *DeleteOrganizatio
 
 	output = &DeleteOrganizationalUnitOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -2369,7 +2366,7 @@ const opDeletePolicy = "DeletePolicy"
 // DeletePolicyRequest generates a "aws/request.Request" representing the
 // client's request for the DeletePolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2403,8 +2400,7 @@ func (c *Organizations) DeletePolicyRequest(input *DeletePolicyInput) (req *requ
 
 	output = &DeletePolicyOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -2540,7 +2536,7 @@ const opDescribeAccount = "DescribeAccount"
 // DescribeAccountRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeAccount operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2701,7 +2697,7 @@ const opDescribeCreateAccountStatus = "DescribeCreateAccountStatus"
 // DescribeCreateAccountStatusRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeCreateAccountStatus operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -2861,7 +2857,7 @@ const opDescribeHandshake = "DescribeHandshake"
 // DescribeHandshakeRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeHandshake operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3026,7 +3022,7 @@ const opDescribeOrganization = "DescribeOrganization"
 // DescribeOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3132,7 +3128,7 @@ const opDescribeOrganizationalUnit = "DescribeOrganizationalUnit"
 // DescribeOrganizationalUnitRequest generates a "aws/request.Request" representing the
 // client's request for the DescribeOrganizationalUnit operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3291,7 +3287,7 @@ const opDescribePolicy = "DescribePolicy"
 // DescribePolicyRequest generates a "aws/request.Request" representing the
 // client's request for the DescribePolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3450,7 +3446,7 @@ const opDetachPolicy = "DetachPolicy"
 // DetachPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the DetachPolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3484,8 +3480,7 @@ func (c *Organizations) DetachPolicyRequest(input *DetachPolicyInput) (req *requ
 
 	output = &DetachPolicyOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -3726,7 +3721,7 @@ const opDisableAWSServiceAccess = "DisableAWSServiceAccess"
 // DisableAWSServiceAccessRequest generates a "aws/request.Request" representing the
 // client's request for the DisableAWSServiceAccess operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -3760,8 +3755,7 @@ func (c *Organizations) DisableAWSServiceAccessRequest(input *DisableAWSServiceA
 
 	output = &DisableAWSServiceAccessOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -4001,7 +3995,7 @@ const opDisablePolicyType = "DisablePolicyType"
 // DisablePolicyTypeRequest generates a "aws/request.Request" representing the
 // client's request for the DisablePolicyType operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -4273,7 +4267,7 @@ const opEnableAWSServiceAccess = "EnableAWSServiceAccess"
 // EnableAWSServiceAccessRequest generates a "aws/request.Request" representing the
 // client's request for the EnableAWSServiceAccess operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -4307,8 +4301,7 @@ func (c *Organizations) EnableAWSServiceAccessRequest(input *EnableAWSServiceAcc
 
 	output = &EnableAWSServiceAccessOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -4545,7 +4538,7 @@ const opEnableAllFeatures = "EnableAllFeatures"
 // EnableAllFeaturesRequest generates a "aws/request.Request" representing the
 // client's request for the EnableAllFeatures operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -4774,7 +4767,7 @@ const opEnablePolicyType = "EnablePolicyType"
 // EnablePolicyTypeRequest generates a "aws/request.Request" representing the
 // client's request for the EnablePolicyType operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -5049,7 +5042,7 @@ const opInviteAccountToOrganization = "InviteAccountToOrganization"
 // InviteAccountToOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the InviteAccountToOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -5285,7 +5278,7 @@ const opLeaveOrganization = "LeaveOrganization"
 // LeaveOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the LeaveOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -5319,8 +5312,7 @@ func (c *Organizations) LeaveOrganizationRequest(input *LeaveOrganizationInput) 
 
 	output = &LeaveOrganizationOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -5576,7 +5568,7 @@ const opListAWSServiceAccessForOrganization = "ListAWSServiceAccessForOrganizati
 // ListAWSServiceAccessForOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the ListAWSServiceAccessForOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -5889,7 +5881,7 @@ const opListAccounts = "ListAccounts"
 // ListAccountsRequest generates a "aws/request.Request" representing the
 // client's request for the ListAccounts operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -6108,7 +6100,7 @@ const opListAccountsForParent = "ListAccountsForParent"
 // ListAccountsForParentRequest generates a "aws/request.Request" representing the
 // client's request for the ListAccountsForParent operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -6333,7 +6325,7 @@ const opListChildren = "ListChildren"
 // ListChildrenRequest generates a "aws/request.Request" representing the
 // client's request for the ListChildren operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -6555,7 +6547,7 @@ const opListCreateAccountStatus = "ListCreateAccountStatus"
 // ListCreateAccountStatusRequest generates a "aws/request.Request" representing the
 // client's request for the ListCreateAccountStatus operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -6773,7 +6765,7 @@ const opListHandshakesForAccount = "ListHandshakesForAccount"
 // ListHandshakesForAccountRequest generates a "aws/request.Request" representing the
 // client's request for the ListHandshakesForAccount operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -6995,7 +6987,7 @@ const opListHandshakesForOrganization = "ListHandshakesForOrganization"
 // ListHandshakesForOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the ListHandshakesForOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -7223,7 +7215,7 @@ const opListOrganizationalUnitsForParent = "ListOrganizationalUnitsForParent"
 // ListOrganizationalUnitsForParentRequest generates a "aws/request.Request" representing the
 // client's request for the ListOrganizationalUnitsForParent operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -7443,7 +7435,7 @@ const opListParents = "ListParents"
 // ListParentsRequest generates a "aws/request.Request" representing the
 // client's request for the ListParents operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -7668,7 +7660,7 @@ const opListPolicies = "ListPolicies"
 // ListPoliciesRequest generates a "aws/request.Request" representing the
 // client's request for the ListPolicies operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -7885,7 +7877,7 @@ const opListPoliciesForTarget = "ListPoliciesForTarget"
 // ListPoliciesForTargetRequest generates a "aws/request.Request" representing the
 // client's request for the ListPoliciesForTarget operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -8107,7 +8099,7 @@ const opListRoots = "ListRoots"
 // ListRootsRequest generates a "aws/request.Request" representing the
 // client's request for the ListRoots operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -8330,7 +8322,7 @@ const opListTargetsForPolicy = "ListTargetsForPolicy"
 // ListTargetsForPolicyRequest generates a "aws/request.Request" representing the
 // client's request for the ListTargetsForPolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -8551,7 +8543,7 @@ const opMoveAccount = "MoveAccount"
 // MoveAccountRequest generates a "aws/request.Request" representing the
 // client's request for the MoveAccount operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -8585,8 +8577,7 @@ func (c *Organizations) MoveAccountRequest(input *MoveAccountInput) (req *reques
 
 	output = &MoveAccountOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -8729,7 +8720,7 @@ const opRemoveAccountFromOrganization = "RemoveAccountFromOrganization"
 // RemoveAccountFromOrganizationRequest generates a "aws/request.Request" representing the
 // client's request for the RemoveAccountFromOrganization operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -8763,8 +8754,7 @@ func (c *Organizations) RemoveAccountFromOrganizationRequest(input *RemoveAccoun
 
 	output = &RemoveAccountFromOrganizationOutput{}
 	req = c.newRequest(op, input, output)
-	req.Handlers.Unmarshal.Remove(jsonrpc.UnmarshalHandler)
-	req.Handlers.Unmarshal.PushBackNamed(protocol.UnmarshalDiscardBodyHandler)
+	req.Handlers.Unmarshal.Swap(jsonrpc.UnmarshalHandler.Name, protocol.UnmarshalDiscardBodyHandler)
 	return
 }
 
@@ -9016,7 +9006,7 @@ const opUpdateOrganizationalUnit = "UpdateOrganizationalUnit"
 // UpdateOrganizationalUnitRequest generates a "aws/request.Request" representing the
 // client's request for the UpdateOrganizationalUnit operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -9184,7 +9174,7 @@ const opUpdatePolicy = "UpdatePolicy"
 // UpdatePolicyRequest generates a "aws/request.Request" representing the
 // client's request for the UpdatePolicy operation. The "output" return
 // value will be populated with the request's response once the request completes
-// successfuly.
+// successfully.
 //
 // Use "Send" method on the returned Request to send the API call to the service.
 // the "output" return value is not valid until after Send returns without error.
@@ -9525,7 +9515,7 @@ type Account struct {
 	//
 	// The regex pattern (http://wikipedia.org/wiki/regex) for this parameter is
 	// a string of characters that represents a standard Internet email address.
-	Email *string `min:"6" type:"string"`
+	Email *string `min:"6" type:"string" sensitive:"true"`
 
 	// The unique identifier (ID) of the account.
 	//
@@ -9544,7 +9534,7 @@ type Account struct {
 	// The regex pattern (http://wikipedia.org/wiki/regex) that is used to validate
 	// this parameter is a string of any of the characters in the ASCII character
 	// range.
-	Name *string `min:"1" type:"string"`
+	Name *string `min:"1" type:"string" sensitive:"true"`
 
 	// The status of the account in the organization.
 	Status *string `type:"string" enum:"AccountStatus"`
@@ -9801,7 +9791,7 @@ type CreateAccountInput struct {
 	// The friendly name of the member account.
 	//
 	// AccountName is a required field
-	AccountName *string `min:"1" type:"string" required:"true"`
+	AccountName *string `min:"1" type:"string" required:"true" sensitive:"true"`
 
 	// The email address of the owner to assign to the new member account. This
 	// email address must not already be associated with another AWS account. You
@@ -9810,7 +9800,7 @@ type CreateAccountInput struct {
 	// invalid email address.
 	//
 	// Email is a required field
-	Email *string `min:"6" type:"string" required:"true"`
+	Email *string `min:"6" type:"string" required:"true" sensitive:"true"`
 
 	// If set to ALLOW, the new account enables IAM users to access account billing
 	// information if they have the required permissions. If set to DENY, only the
@@ -9947,7 +9937,7 @@ type CreateAccountStatus struct {
 	AccountId *string `type:"string"`
 
 	// The account name given to the account when it was created.
-	AccountName *string `min:"1" type:"string"`
+	AccountName *string `min:"1" type:"string" sensitive:"true"`
 
 	// The date and time that the account was created and the request completed.
 	CompletedTimestamp *time.Time `type:"timestamp"`
@@ -11506,7 +11496,7 @@ type HandshakeParty struct {
 	// requires "h-" followed by from 8 to 32 lower-case letters or digits.
 	//
 	// Id is a required field
-	Id *string `min:"1" type:"string" required:"true"`
+	Id *string `min:"1" type:"string" required:"true" sensitive:"true"`
 
 	// The type of party.
 	//
@@ -11584,7 +11574,7 @@ type HandshakeResource struct {
 
 	// The information that is passed to the other party in the handshake. The format
 	// of the value string must match the requirements of the specified type.
-	Value *string `type:"string"`
+	Value *string `type:"string" sensitive:"true"`
 }
 
 // String returns the string representation
@@ -11620,7 +11610,7 @@ type InviteAccountToOrganizationInput struct {
 
 	// Additional information that you want to include in the generated email to
 	// the recipient account owner.
-	Notes *string `type:"string"`
+	Notes *string `type:"string" sensitive:"true"`
 
 	// The identifier (ID) of the AWS account that you want to invite to join your
 	// organization. This is a JSON object that contains the following elements:
@@ -13311,7 +13301,7 @@ type Organization struct {
 
 	// The email address that is associated with the AWS account that is designated
 	// as the master account for the organization.
-	MasterAccountEmail *string `min:"6" type:"string"`
+	MasterAccountEmail *string `min:"6" type:"string" sensitive:"true"`
 
 	// The unique identifier (ID) of the master account of an organization.
 	//
